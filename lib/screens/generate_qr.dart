@@ -9,7 +9,7 @@ class GenerateQr extends StatefulWidget {
 }
 
 class _GenerateQrState extends State<GenerateQr> {
-  TextEditingController _textEditingController = TextEditingController();
+  final TextEditingController _textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {

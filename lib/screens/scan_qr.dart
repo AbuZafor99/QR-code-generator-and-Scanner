@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class ScanQr extends StatefulWidget {
   const ScanQr({super.key});
@@ -9,41 +9,14 @@ class ScanQr extends StatefulWidget {
 }
 
 class _ScanQrState extends State<ScanQr> {
-  String scannedResult = 'Not scanned yet';
-
-  Future<void> startScan() async {
-    String barcodeScanRes;
-
-    try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", // Scanner line color
-        "Cancel",  // Cancel button text
-        true,      // Show flash icon
-        ScanMode.QR,
-      );
-    } catch (e) {
-      barcodeScanRes = 'Failed to get scan result.';
-    }
-
-    if (!mounted) return;
-
-    setState(() {
-      scannedResult = barcodeScanRes != '-1' ? barcodeScanRes : 'Scan cancelled';
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    startScan(); // Automatically open scanner on page open
-  }
+  String? scannedResult;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Scan QR",
+        title: const Text(
+          'Scan QR',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -52,11 +25,30 @@ class _ScanQrState extends State<ScanQr> {
         ),
         backgroundColor: Colors.blue,
       ),
-      body: Center(
-        child: Text(
-          "Result: $scannedResult",
-          style: TextStyle(fontSize: 16),
-        ),
+      body: Column(
+        children: [
+          Expanded(
+            flex: 5,
+            child: MobileScanner(
+              onDetect: (capture) {
+                final List<Barcode> barcodes = capture.barcodes;
+                if (barcodes.isNotEmpty) {
+                  setState(() {
+                    scannedResult = barcodes.first.rawValue;
+                  });
+                }
+              },
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: Text(
+                'Result: ${scannedResult ?? 'Not scanned yet'}'
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
